@@ -28,15 +28,43 @@ def predict_heart_attack(data):
 
 # Fungsi untuk memvisualisasikan data
 def plot_data(df):
+    # Grafik 1: Scatter plot hubungan antara usia dan kolesterol
     fig = px.scatter(df, x='age', y='chol', color='target', 
                      title="Hubungan Usia dan Kolesterol terhadap Risiko Serangan Jantung",
                      labels={'age': 'Usia', 'chol': 'Kadar Kolesterol (mg/dl)', 'target': 'Risiko'})
     st.plotly_chart(fig)
 
-    # Tambahkan grafik lainnya jika diinginkan
+    # Grafik 2: Histogram distribusi usia
     fig2 = go.Figure(data=[go.Histogram(x=df['age'], nbinsx=20)])
     fig2.update_layout(title="Distribusi Usia", xaxis_title="Usia", yaxis_title="Jumlah")
     st.plotly_chart(fig2)
+
+    # Grafik 3: Histogram distribusi kolesterol
+    fig3 = go.Figure(data=[go.Histogram(x=df['chol'], nbinsx=20)])
+    fig3.update_layout(title="Distribusi Kadar Kolesterol", xaxis_title="Kadar Kolesterol (mg/dl)", yaxis_title="Jumlah")
+    st.plotly_chart(fig3)
+
+    # Grafik 4: Bar plot distribusi jenis kelamin berdasarkan risiko serangan jantung
+    gender_risk = df.groupby(['sex', 'target']).size().reset_index(name='count')
+    gender_risk['sex'] = gender_risk['sex'].map({0: 'Perempuan', 1: 'Laki-laki'})
+    fig4 = px.bar(gender_risk, x='sex', y='count', color='target', 
+                  title="Distribusi Risiko Berdasarkan Jenis Kelamin", 
+                  labels={'sex': 'Jenis Kelamin', 'count': 'Jumlah Kasus', 'target': 'Risiko'})
+    st.plotly_chart(fig4)
+
+    # Grafik 5: Box plot tekanan darah berdasarkan risiko
+    fig5 = px.box(df, x='target', y='trestbps', 
+                  title="Distribusi Tekanan Darah Saat Istirahat Berdasarkan Risiko Serangan Jantung",
+                  labels={'target': 'Risiko', 'trestbps': 'Tekanan Darah Saat Istirahat (mm Hg)'})
+    st.plotly_chart(fig5)
+
+    # Grafik 6: Pie chart distribusi risiko serangan jantung
+    risk_distribution = df['target'].value_counts().reset_index()
+    risk_distribution.columns = ['target', 'count']
+    fig6 = px.pie(risk_distribution, names='target', values='count', 
+                  title="Distribusi Risiko Serangan Jantung (0: Tidak, 1: Ya)",
+                  labels={'target': 'Risiko', 'count': 'Jumlah Kasus'})
+    st.plotly_chart(fig6)
 
 # Membuat halaman multipage
 st.title("Aplikasi Deteksi Serangan Jantung")
